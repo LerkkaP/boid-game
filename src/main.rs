@@ -4,6 +4,7 @@ struct Boid {
     v1: Vec2,
     v2: Vec2,
     v3: Vec2,
+    rotation: f32,
 }
 
 impl Boid {
@@ -49,16 +50,22 @@ async fn main() {
         v1: vec2(screen_center_x - size, screen_center_y + size * multiplier),
         v2: vec2(screen_center_x, screen_center_y),
         v3: vec2(screen_center_x + size, screen_center_y + size * multiplier),
+        rotation: 0.0,
     };
 
     loop {
         clear_background(BLACK);
         
         let (mouse_x, mouse_y) = mouse_position();
-        let angle = boid.angle_to_mouse(mouse_x, mouse_y);
+
+        let target_angle = boid.angle_to_mouse(mouse_x, mouse_y);
+        let delta = target_angle - boid.rotation;
+
+        boid.rotate(delta);
+        boid.rotation = target_angle; 
+       
         draw_triangle(boid.v1, boid.v2, boid.v3, WHITE);
-        println!("{}", boid.angle_to_mouse(mouse_x, mouse_y));
-        
+
         next_frame().await
     }
 }
