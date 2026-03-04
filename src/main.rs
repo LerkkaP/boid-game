@@ -16,9 +16,21 @@ impl Boid {
 
     fn angle_to_mouse(&self, mouse_x: f32, mouse_y: f32) -> f32 {
         let (x, y) = self.get_center();
-        let dx = mouse_x - x;
-        let dy = mouse_y - y;
-        dy.atan2(dx) // in radians
+
+        // center to mouse
+        let dx_mouse = mouse_x - x;
+        let dy_mouse = mouse_y - y;
+
+        // center to tip
+        let dx_tip_cen = self.v2.x - x;
+        let dy_tip_cen = self.v2.y - y;
+
+        // in radians
+        let mouse_angle = dy_mouse.atan2(dx_mouse);
+        let tip_angle = dy_tip_cen.atan2(dx_tip_cen);
+
+        // rotation needed
+        mouse_angle - tip_angle
     }
 
     fn rotate(&mut self, angle: f32) -> () {
@@ -58,11 +70,9 @@ async fn main() {
         
         let (mouse_x, mouse_y) = mouse_position();
 
-        let target_angle = boid.angle_to_mouse(mouse_x, mouse_y);
-        let delta = target_angle - boid.rotation;
-
+        let delta = boid.angle_to_mouse(mouse_x, mouse_y);
         boid.rotate(delta);
-        boid.rotation = target_angle; 
+        boid.rotation += delta;
        
         draw_triangle(boid.v1, boid.v2, boid.v3, WHITE);
 
