@@ -7,6 +7,12 @@ struct Boid {
     rotation: f32,
 }
 
+struct Collectible {
+    x: f32,
+    y: f32,
+    radius: f32,
+}
+
 impl Boid {
     fn get_center(&self) -> (f32, f32) {
         let x = (self.v1.x + self.v2.x + self.v3.x) / 3.0;
@@ -75,6 +81,14 @@ impl Boid {
     }
 }
 
+impl Collectible {
+    fn collides_with(&self, tip: Vec2) -> bool {
+        // need to only check the tip vertex v2
+        let tip_distance_to_center = ((self.x-tip.x).powf(2.0)+(self.y-tip.y).powf(2.0)).sqrt();
+        tip_distance_to_center <= self.radius
+    }
+}
+
 #[macroquad::main("Boid simulation")]
 async fn main() {
 
@@ -87,6 +101,11 @@ async fn main() {
         v3: vec2(screen_center_x + size, screen_center_y + size * multiplier),
         rotation: 0.0,
     };
+    let collectible = Collectible {
+        x: 50.0,
+        y: 50.0,
+        radius: 10.0,
+    };
     let mut trace: Vec<(f32, f32)> = Vec::new();
 
     loop {
@@ -98,6 +117,9 @@ async fn main() {
         boid.rotation += delta;
         boid.move_boid(mouse_x, mouse_y);
         draw_triangle(boid.v1, boid.v2, boid.v3, WHITE);
+        draw_circle(collectible.x, collectible.y, collectible.radius, WHITE);
+        let collision = collectible.collides_with(boid.v2);
+        println!("{}", collision);
         for pos in &trace {
             draw_circle(pos.0, pos.1, 1.0, BLUE);
         }
