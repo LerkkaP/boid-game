@@ -68,14 +68,10 @@ impl Boid {
         let velocity_x = dir_x * speed * delta;
         let velocity_y = dir_y * speed * delta;
 
-        self.v1.x += velocity_x;
-        self.v1.y += velocity_y;
-
-        self.v2.x += velocity_x;
-        self.v2.y += velocity_y;
-
-        self.v3.x += velocity_x;
-        self.v3.y += velocity_y;
+        for v in [&mut self.v1, &mut self.v2, &mut self.v3] {
+            v.x += velocity_x;
+            v.y += velocity_y;
+        }
     }
 }
 
